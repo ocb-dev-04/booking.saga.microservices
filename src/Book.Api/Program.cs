@@ -92,8 +92,7 @@ app.MapGet("/book/success-history", async (
 
     return Results.Ok(collection);
 })
-.WithName("Get book success history")
-.WithDescription("Return a saga sucess book collection");
+.WithName("Get book success history");
 
 app.MapGet("/book/failed-history", async (
     AppDbContext dbContext,
@@ -106,8 +105,7 @@ app.MapGet("/book/failed-history", async (
 
     return Results.Ok(collection);
 })
-.WithName("Get book failed history")
-.WithDescription("Return a saga failed book collection");
+.WithName("Get book failed history");
 
 app.Run();
 
