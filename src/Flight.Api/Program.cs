@@ -1,11 +1,14 @@
-using Flight.Api.Consumers;
-using Flight.Api.DatabaseContext;
 using MassTransit;
+using Flight.Api.Consumers;
+using Common.Message.Queue;
+using Flight.Api.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddCommonMessageQueueServices();
 
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>

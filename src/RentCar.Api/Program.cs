@@ -1,11 +1,14 @@
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
+using Common.Message.Queue;
 using RentCar.Api.Consumers;
 using RentCar.Api.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddCommonMessageQueueServices();
 
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>

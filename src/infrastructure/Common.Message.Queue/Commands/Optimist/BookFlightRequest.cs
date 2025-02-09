@@ -4,7 +4,7 @@ namespace Common.Message.Queue.Commands;
 
 [EntityName("saga-book-flight-bind")]
 public sealed record BookFlightRequest(
-    Guid CorrelationalId,
+    Guid CorrelationId,
     Guid TravelerId, 
     string FlightFrom,
     string FlightTo,

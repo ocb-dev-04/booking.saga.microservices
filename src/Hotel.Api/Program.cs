@@ -1,11 +1,14 @@
 using MassTransit;
 using Hotel.Api.Consumers;
+using Common.Message.Queue;
 using Hotel.Api.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddCommonMessageQueueServices();
 
 builder.Services.AddDbContext<AppDbContext>(options => {
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>

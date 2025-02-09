@@ -2,12 +2,14 @@ using MassTransit;
 using Book.Api.Saga;
 using Scalar.AspNetCore;
 using Book.Api.Consumer;
+using Common.Message.Queue;
 using Book.Api.DatabaseContext;
-using Common.Message.Queue.Commands;
 using Microsoft.EntityFrameworkCore;
 using Common.Message.Queue.Events;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCommonMessageQueueServices();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
