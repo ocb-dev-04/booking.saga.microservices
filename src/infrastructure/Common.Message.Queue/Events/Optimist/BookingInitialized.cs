@@ -4,7 +4,6 @@ namespace Common.Message.Queue.Events;
 
 [EntityName("saga-booking-initialized-event")]
 public sealed record BookingInitialized(
-    Guid TravelerId,
     string Email,
 
     string HotelName,
@@ -13,4 +12,7 @@ public sealed record BookingInitialized(
     string FlightTo,
     string FlightCode,
     
-    string CarPlateNumber);
+    string CarPlateNumber)
+{
+    public Guid CorrelationId { get; init; } = Guid.NewGuid();
+}

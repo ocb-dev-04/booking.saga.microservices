@@ -11,20 +11,20 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
 
     // step 1
     public State HotelBooking { get; set; }
-    public State HotelBookingError { get; set; }
     public Event<HotelBooked> HotelBooked { get; set; }
+    public State HotelBookingError { get; set; }
     public Event<HotelBookedError> HotelBookedError { get; set; }
 
     // step 2
     public State FlightBooking { get; set; }
-    public State FlightBookingError { get; set; }
     public Event<FlightBooked> FlightBooked { get; set; }
+    public State FlightBookingError { get; set; }
     public Event<FlightBookedError> FlightBookedError { get; set; }
 
     // step 3
     public State CarRenting { get; set; }
-    public State CarRentingError { get; set; }
     public Event<CarRented> CarRented { get; set; }
+    public State CarRentingError { get; set; }
     public Event<CarRentedError> CarRentedError { get; set; }
 
     // final step
@@ -36,23 +36,22 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
         InstanceState(x => x.CurrentState);
 
         //optimist
-        Event(() => BookingInitialized, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => HotelBooked, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => FlightBooked, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => CarRented, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => BookingCompleted, e => e.CorrelateById(m => m.Message.TravelerId));
+        Event(() => BookingInitialized, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => HotelBooked, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => FlightBooked, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => CarRented, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => BookingCompleted, e => e.CorrelateById(m => m.Message.CorrelationId));
 
         // pessimist
-        Event(() => HotelBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => FlightBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
-        Event(() => CarRentedError, e => e.CorrelateById(m => m.Message.TravelerId));
+        //Event(() => HotelBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
+        //Event(() => FlightBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
+        //Event(() => CarRentedError, e => e.CorrelateById(m => m.Message.TravelerId));
 
         Initially(
             When(BookingInitialized)
                 .Then(context
                     =>
                 {
-                    context.Saga.TravelerId = context.Message.TravelerId;
                     context.Saga.Email = context.Message.Email;
 
                     context.Saga.HotelName = context.Message.HotelName;
@@ -66,7 +65,7 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
                 .TransitionTo(BookingInitialize)
                 .Publish(context
                     => new BookHotelRequest(
-                        context.Saga.TravelerId,
+                        context.Saga.CorrelationId,
                         context.Saga.Email,
                         context.Saga.HotelName)));
 
@@ -82,6 +81,7 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
                 .TransitionTo(FlightBooking)
                 .Publish(context
                     => new BookFlightRequest(
+                        context.Saga.CorrelationId,
                         context.Saga.TravelerId,
                         context.Saga.FlightFrom,
                         context.Saga.FlightTo,
@@ -95,6 +95,7 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
                 .TransitionTo(CarRenting)
                 .Publish(context
                     => new RentCarRequest(
+                        context.Message.CorrelationId,
                         context.Saga.TravelerId,
                         context.Saga.CarPlateNumber)));
 
@@ -105,7 +106,9 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
                     => context.Saga.CarRented = true)
                 .TransitionTo(BookingCompleting)
                 .Publish(context
-                    => new BookingCompleted(context.Message.TravelerId)));
+                    => new BookingCompleted(
+                            context.Message.CorrelationId, 
+                            context.Message.TravelerId)));
 
         During(
             BookingCompleting,

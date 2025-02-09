@@ -13,7 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>
     {
-        config.MigrationsHistoryTable("_mmigrations");
+        config.MigrationsHistoryTable("_migrations");
     });
 });
 
@@ -59,7 +59,6 @@ if (app.Environment.IsDevelopment())
 
     using IServiceScope scope = app.Services.CreateScope();
     AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
     context.Database.Migrate();
 }
 
@@ -70,7 +69,6 @@ app.MapPost("/book", async (
 {
     await bus.Publish(
         new BookingInitialized(
-            body.TravelerId,
             body.Email,
             body.HotelName,
             body.FlightFrom,
@@ -97,7 +95,7 @@ app.MapGet("/book/success-history", async (
 .WithName("Get book success history")
 .WithDescription("Return a saga sucess book collection");
 
-app.MapGet("/book/sucess-failed", async (
+app.MapGet("/book/failed-history", async (
     AppDbContext dbContext,
     CancellationToken cancellationToken) =>
 {
@@ -114,7 +112,6 @@ app.MapGet("/book/sucess-failed", async (
 app.Run();
 
 public sealed record BookingDetails(
-    Guid TravelerId,
     string Email,
 
     string HotelName,

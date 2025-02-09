@@ -25,6 +25,8 @@ internal sealed class BookHotelConsumer : IConsumer<BookHotelRequest>
         await _dbContext.HotelRegistration.AddAsync(created);
         await _dbContext.SaveChangesAsync();
 
-        await context.Publish(new HotelBooked(created.Id));
+        await context.Publish(new HotelBooked(
+            context.Message.CorrelationId, 
+            created.Id));
     }
 }

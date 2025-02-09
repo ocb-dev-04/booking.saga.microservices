@@ -18,6 +18,9 @@ internal sealed class RentCarConsumer(AppDbContext dbContext) : IConsumer<RentCa
         await dbContext.CarRegistration.AddAsync(created, context.CancellationToken);
         await dbContext.SaveChangesAsync(context.CancellationToken);
 
-        await context.Publish(new CarRented(context.Message.TravelerId, created.Id));
+        await context.Publish(new CarRented(
+            context.Message.CorrelationId, 
+            context.Message.TravelerId, 
+            created.Id));
     }
 }

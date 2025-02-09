@@ -10,7 +10,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options => {
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>
         {
-            config.MigrationsHistoryTable("_mmigrations");
+            config.MigrationsHistoryTable("_migrations");
         });
 });
 
@@ -44,7 +44,6 @@ if (app.Environment.IsDevelopment())
 
     using IServiceScope scope = app.Services.CreateScope();
     AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
     context.Database.Migrate();
 }
 

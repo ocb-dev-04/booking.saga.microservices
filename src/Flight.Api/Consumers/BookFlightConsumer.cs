@@ -23,6 +23,7 @@ internal sealed class BookFlightConsumer(
         await dbContext.SaveChangesAsync(context.CancellationToken)
 ;
         await context.Publish(new FlightBooked(
+            context.Message.CorrelationalId,
             context.Message.TravelerId,
             created.Id));
     }
