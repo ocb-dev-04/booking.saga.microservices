@@ -1,0 +1,23 @@
+﻿@Book.Api_HostAddress = http://localhost:5000
+
+POST {{Book.Api_HostAddress}}/book
+Content-Type: application/json
+
+{
+  "email": "test@gmail.com",
+  "hotelName": "Barcelo Hotel & Casino",
+  "flightFrom": "Colombia",
+  "flightTo": "Dominican Republic",
+  "flightCode": "RD294037",
+  "carPlateNumber": "G294836"
+}
+
+###
+
+GET {{Book.Api_HostAddress}}/book/failed-history
+
+###
+
+GET {{Book.Api_HostAddress}}/book/success-history
+
+###

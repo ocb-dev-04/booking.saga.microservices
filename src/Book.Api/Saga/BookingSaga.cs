@@ -43,9 +43,9 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
         Event(() => BookingCompleted, e => e.CorrelateById(m => m.Message.CorrelationId));
 
         // pessimist
-        //Event(() => HotelBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
-        //Event(() => FlightBookedError, e => e.CorrelateById(m => m.Message.TravelerId));
-        //Event(() => CarRentedError, e => e.CorrelateById(m => m.Message.TravelerId));
+        Event(() => HotelBookedError, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => FlightBookedError, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => CarRentedError, e => e.CorrelateById(m => m.Message.CorrelationId));
 
         Initially(
             When(BookingInitialized)
