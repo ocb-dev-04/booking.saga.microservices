@@ -15,16 +15,13 @@ internal sealed class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        EntityTypeBuilder<BookingSagaData> entityBuilder = modelBuilder.Entity<BookingSagaData>();
+        EntityTypeBuilder<CarRegistration> entityBuilder = modelBuilder.Entity<CarRegistration>();
 
-        entityBuilder.HasKey(k => k.CorrelationId);
+        entityBuilder.HasKey(k => k.Id);
         entityBuilder.HasIndex(s => new
         {
-            s.CorrelationId,
             s.TravelerId,
-            s.SuccessOnUtc,
-            s.FailedOnUtc,
-            s.SomeErrorOcurred
+            s.PlateNumber,
         });
     }
 }

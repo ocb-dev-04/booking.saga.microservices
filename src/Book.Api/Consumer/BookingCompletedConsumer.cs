@@ -7,7 +7,7 @@ internal sealed class BookingCompletedConsumer : IConsumer<BookingCompleted>
 {
     public Task Consume(ConsumeContext<BookingCompleted> context)
     {
-        Console.WriteLine($"Booking process is completed for Traveler {context.Message.TravelerId} with email {context.Message.Email}");
+        Console.WriteLine($"Booking process is completed for Traveler {context.Message.TravelerId}");
 
         return Task.CompletedTask;
     }
