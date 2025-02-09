@@ -3,4 +3,4 @@
 namespace Common.Message.Queue.Commands;
 
 [EntityName("saga-rent-car-rollback-bind")]
-public sealed record RentCarRollbackRequest(Guid TravelerId, Guid RegistrationId);
+public sealed record RentCarRollbackRequest(Guid CorrelationId, Guid RegistrationId);
