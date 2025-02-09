@@ -17,6 +17,8 @@ internal sealed class RentCarConsumer(
         await exceptionsHandlerService.ExecuteAsync(
             async () =>
             {
+                throw new Exception("Testing rollback logic");
+
                 Console.WriteLine($"Car renting - Plate Number {context.Message.CarPlateNumber} for traveler {context.Message.TravelerId}");
 
                 CarRegistration created = new(
