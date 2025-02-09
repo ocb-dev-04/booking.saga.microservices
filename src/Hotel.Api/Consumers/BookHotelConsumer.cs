@@ -8,9 +8,9 @@ namespace Hotel.Api.Consumers;
 
 internal sealed class BookHotelConsumer : IConsumer<BookHotelRequest>
 {
-    private readonly HotelDbContext _dbContext;
+    private readonly AppDbContext _dbContext;
 
-    public BookHotelConsumer(HotelDbContext dbContext)
+    public BookHotelConsumer(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -19,15 +19,12 @@ internal sealed class BookHotelConsumer : IConsumer<BookHotelRequest>
     {
         Console.WriteLine($"Booking hotel {context.Message.HotelName} for traveler {context.Message.Email}");
 
-        Traveler traveler = new Traveler(Guid.NewGuid(), context.Message.Email, DateTime.Now);
-        await _dbContext.Set<Traveler>().AddAsync(traveler);
+        HotelRegistration created = new (
+            context.Message.Email, 
+            context.Message.HotelName);
+        await _dbContext.HotelRegistration.AddAsync(created);
         await _dbContext.SaveChangesAsync();
 
-        await context.Publish(new HotelBooked(
-            traveler.Id,
-            traveler.Email,
-            context.Message.HotelName,
-            context.Message.FlightCode,
-            context.Message.CarPlateNumber));
+        await context.Publish(new HotelBooked(created.Id));
     }
 }

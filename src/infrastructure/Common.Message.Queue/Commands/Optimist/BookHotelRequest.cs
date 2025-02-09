@@ -2,9 +2,8 @@
 
 namespace Common.Message.Queue.Commands;
 
-[EntityName("book-hotel-saga-bind")]
+[EntityName("saga-book-hotel-bind")]
 public sealed record BookHotelRequest(
+    Guid TravelerId,
     string Email, 
-    string HotelName, 
-    string FlightCode, 
-    string CarPlateNumber);
+    string HotelName);

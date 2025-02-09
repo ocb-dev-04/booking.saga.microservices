@@ -7,10 +7,10 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<HotelDbContext>(options => {
+builder.Services.AddDbContext<AppDbContext>(options => {
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>
         {
-            config.MigrationsHistoryTable("hotel_mmigrations");
+            config.MigrationsHistoryTable("_mmigrations");
         });
 });
 
@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
     using IServiceScope scope = app.Services.CreateScope();
-    HotelDbContext context = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
+    AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.EnsureCreated();
     context.Database.Migrate();
 }

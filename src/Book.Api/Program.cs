@@ -1,17 +1,19 @@
 using MassTransit;
 using Book.Api.Saga;
 using Scalar.AspNetCore;
+using Book.Api.Consumer;
 using Book.Api.DatabaseContext;
 using Common.Message.Queue.Commands;
 using Microsoft.EntityFrameworkCore;
-using Book.Api.Consumer;
+using Common.Message.Queue.Events;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<BookDbContext>(options => {
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDb"), config =>
     {
-        config.MigrationsHistoryTable("book_mmigrations");
+        config.MigrationsHistoryTable("_mmigrations");
     });
 });
 
@@ -24,7 +26,7 @@ builder.Services.AddMassTransit(busConfigurator =>
     busConfigurator.AddSagaStateMachine<BookingSaga, BookingSagaData>()
         .EntityFrameworkRepository(r =>
         {
-            r.ExistingDbContext<BookDbContext>();
+            r.ExistingDbContext<AppDbContext>();
 
             r.UsePostgres();
         });
@@ -56,34 +58,69 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 
     using IServiceScope scope = app.Services.CreateScope();
-    BookDbContext context = scope.ServiceProvider.GetRequiredService<BookDbContext>();
+    AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.EnsureCreated();
     context.Database.Migrate();
 }
 
 app.MapPost("/book", async (
-    BookingDetails bookingDetails,
+    BookingDetails body,
     IBus bus,
     CancellationToken cancellationToken) =>
 {
     await bus.Publish(
-        new BookHotelRequest(
-            bookingDetails.Email, 
-            bookingDetails.HotelName, 
-            bookingDetails.FlightCode, 
-            bookingDetails.CarPlateNumber),
+        new BookingInitialized(
+            body.TravelerId,
+            body.Email,
+            body.HotelName,
+            body.FlightFrom,
+            body.FlightTo,
+            body.FlightCode,
+            body.CarPlateNumber),
         cancellationToken);
 
     return Results.Ok();
 })
 .WithName("Create a new book");
 
+app.MapGet("/book/success-history", async (
+    AppDbContext dbContext,
+    CancellationToken cancellationToken) =>
+{
+    BookingSagaData[] collection = await dbContext.BookingSagaData
+        .Where(w => !w.SomeErrorOcurred)
+        .OrderByDescending(o => o.SuccessOnUtc)
+        .ToArrayAsync();
+
+    return Results.Ok(collection);
+})
+.WithName("Get book success history")
+.WithDescription("Return a saga sucess book collection");
+
+app.MapGet("/book/sucess-failed", async (
+    AppDbContext dbContext,
+    CancellationToken cancellationToken) =>
+{
+    BookingSagaData[] collection = await dbContext.BookingSagaData
+        .Where(w => w.SomeErrorOcurred)
+        .OrderByDescending(o => o.FailedOnUtc)
+        .ToArrayAsync();
+
+    return Results.Ok(collection);
+})
+.WithName("Get book failed history")
+.WithDescription("Return a saga failed book collection");
+
 app.Run();
 
-public class BookingDetails
-{
-    public string Email { get; set; } = string.Empty;
-    public string HotelName { get; set; } = string.Empty;
-    public string FlightCode { get; set; } = string.Empty;
-    public string CarPlateNumber { get; set; } = string.Empty;
-}
+public sealed record BookingDetails(
+    Guid TravelerId,
+    string Email,
+
+    string HotelName,
+
+    string FlightFrom,
+    string FlightTo,
+    string FlightCode,
+
+    string CarPlateNumber);

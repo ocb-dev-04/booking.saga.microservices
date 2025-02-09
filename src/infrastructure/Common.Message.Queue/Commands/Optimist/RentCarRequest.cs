@@ -2,8 +2,7 @@
 
 namespace Common.Message.Queue.Commands;
 
-[EntityName("rent-car-saga-bind")]
+[EntityName("saga-rent-car-bind")]
 public sealed record RentCarRequest(
     Guid TravelerId, 
-    string Email, 
     string CarPlateNumber);
