@@ -1,20 +1,20 @@
 ﻿using MassTransit;
 
-namespace Hotel.Api.Consumers;
+namespace RentCar.Api.Consumers;
 
-internal sealed class BookHotelConsumerDefinition 
-    : ConsumerDefinition<BookHotelConsumer>
+internal sealed class RentCarRollbackConsumerDefinition 
+    : ConsumerDefinition<RentCarRollbackConsumer>
 {
-    private readonly static string _consumerName = "saga-book-hotel-queue";
+    private readonly static string _consumerName = "saga-rent-car-rollback-queue";
 
-    public BookHotelConsumerDefinition()
+    public RentCarRollbackConsumerDefinition()
     {
         EndpointName = _consumerName;
     }
 
     protected override void ConfigureConsumer(
         IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<BookHotelConsumer> consumerConfigurator,
+        IConsumerConfigurator<RentCarRollbackConsumer> consumerConfigurator,
         IRegistrationContext context)
     {
         endpointConfigurator.DiscardSkippedMessages();

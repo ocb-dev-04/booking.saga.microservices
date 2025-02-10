@@ -24,10 +24,14 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
     public Event<CarRented> CarRented { get; set; }
     public Event<CarRentedError> CarRentedError { get; set; }
 
-    // final step
+    // step 4
     public State BookingCompleting { get; set; }
     public Event<BookingCompleted> BookingCompleted { get; set; }
     public Event<BookingCompletedError> BookingCompletedError { get; set; }
+    
+    // last step
+    public State BookingSuccess { get; set; }
+    public Event<BookingSucceed> BookingSucceed { get; set; }
 
     public BookingSaga()
     {
@@ -39,6 +43,7 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
         Event(() => FlightBooked, e => e.CorrelateById(m => m.Message.CorrelationId));
         Event(() => CarRented, e => e.CorrelateById(m => m.Message.CorrelationId));
         Event(() => BookingCompleted, e => e.CorrelateById(m => m.Message.CorrelationId));
+        Event(() => BookingSucceed, e => e.CorrelateById(m => m.Message.CorrelationId));
 
         // pessimist
         Event(() => HotelBookedError, e => e.CorrelateById(m => m.Message.CorrelationId));
@@ -57,8 +62,8 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
 
                     context.Saga.HotelName = context.Message.HotelName;
 
-                    context.Saga.FlightFrom = context.Message.FlightCode;
-                    context.Saga.FlightTo = context.Message.FlightCode;
+                    context.Saga.FlightFrom = context.Message.FlightFrom;
+                    context.Saga.FlightTo = context.Message.FlightTo;
                     context.Saga.FlightCode = context.Message.FlightCode;
 
                     context.Saga.CarPlateNumber = context.Message.CarPlateNumber;
@@ -123,6 +128,17 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
         During(
             BookingCompleting,
             When(BookingCompleted)
+                .TransitionTo(BookingSuccess)
+                .Then(context
+                    =>
+                {
+                    context.Saga.SuccessOnUtc = DateTimeOffset.UtcNow;
+                    context.Saga.BookingFinished = true;
+                }));
+
+        During(
+            BookingSuccess,
+            When(BookingSucceed)
                 .Then(context
                     =>
                 {
@@ -136,7 +152,7 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
         #region Pessimist events
 
         During(
-            BookingCompleting,
+            BookingSuccess,
             When(BookingCompletedError)
                 .Then(context
                     =>
@@ -183,7 +199,6 @@ internal sealed class BookingSaga : MassTransitStateMachine<BookingSagaData>
                     context.Saga.StackTrace = context.Message.StackTrace;
                     context.Saga.SomeErrorOcurred = true;
                 })
-
                 .TransitionTo(HotelBooking)
                 .Publish(context
                     => new BookHotelRollbackRequest(

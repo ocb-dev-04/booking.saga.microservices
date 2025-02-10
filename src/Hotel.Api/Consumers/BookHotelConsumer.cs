@@ -1,10 +1,10 @@
 ﻿using MassTransit;
+using System.Text.Json;
 using Hotel.Api.Entities;
 using Hotel.Api.DatabaseContext;
 using Common.Message.Queue.Events;
 using Common.Message.Queue.Commands;
 using Common.Message.Queue.Services;
-using System.Text.Json;
 
 namespace Hotel.Api.Consumers;
 
@@ -17,6 +17,9 @@ internal sealed class BookHotelConsumer(
         await exceptionsHandlerService.ExecuteAsync(
             async () =>
             {
+                // exception to test rollbac from here
+                //throw new Exception($"Exception in {nameof(BookHotelConsumer)}");
+
                 Console.WriteLine($"Booking hotel {context.Message.HotelName} for traveler {context.Message.Email}");
 
                 HotelRegistration created = new(

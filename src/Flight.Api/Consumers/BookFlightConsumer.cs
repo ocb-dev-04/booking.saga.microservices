@@ -17,6 +17,9 @@ internal sealed class BookFlightConsumer(
         await exceptionsHandlerService.ExecuteAsync(
             async () =>
             {
+                // exception to test rollbac from here
+                //throw new Exception($"Exception in {nameof(BookFlightConsumer)}");
+
                 Console.WriteLine($"Booking flight number: {context.Message.FlightCode}. From: {context.Message.FlightFrom} - To: {context.Message.FlightTo}. Traveler id: {context.Message.TravelerId}");
 
                 FlightRegistration created = new(

@@ -2,19 +2,19 @@
 
 namespace Hotel.Api.Consumers;
 
-internal sealed class BookHotelConsumerDefinition 
-    : ConsumerDefinition<BookHotelConsumer>
+internal sealed class BookHotelRollbackConsumerDefinition 
+    : ConsumerDefinition<BookHotelRollbackConsumer>
 {
-    private readonly static string _consumerName = "saga-book-hotel-queue";
+    private readonly static string _consumerName = "saga-book-hotel-rollback-queue";
 
-    public BookHotelConsumerDefinition()
+    public BookHotelRollbackConsumerDefinition()
     {
         EndpointName = _consumerName;
     }
 
     protected override void ConfigureConsumer(
         IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<BookHotelConsumer> consumerConfigurator,
+        IConsumerConfigurator<BookHotelRollbackConsumer> consumerConfigurator,
         IRegistrationContext context)
     {
         endpointConfigurator.DiscardSkippedMessages();

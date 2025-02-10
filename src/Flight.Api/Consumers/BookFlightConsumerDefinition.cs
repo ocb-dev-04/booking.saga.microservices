@@ -5,7 +5,7 @@ namespace Flight.Api.Consumers;
 internal sealed class BookFlightConsumerDefinition
     : ConsumerDefinition<BookFlightConsumer>
 {
-    private readonly static string _consumerName = "booking-flight-saga-queue";
+    private readonly static string _consumerName = "saga-booking-flight-queue";
 
     public BookFlightConsumerDefinition()
     {

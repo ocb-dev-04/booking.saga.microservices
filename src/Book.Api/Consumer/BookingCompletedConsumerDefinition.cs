@@ -5,7 +5,7 @@ namespace Book.Api.Consumer;
 internal sealed class BookingCompletedConsumerDefinition
     : ConsumerDefinition<BookingCompletedConsumer>
 {
-    private readonly static string _consumerName = "booking-completed-saga-queue";
+    private readonly static string _consumerName = "saga-booking-completed-queue";
 
     public BookingCompletedConsumerDefinition()
     {

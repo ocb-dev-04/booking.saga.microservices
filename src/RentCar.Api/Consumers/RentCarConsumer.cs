@@ -1,10 +1,10 @@
 ﻿using MassTransit;
+using System.Text.Json;
 using RentCar.Api.Entities;
 using Common.Message.Queue.Events;
 using RentCar.Api.DatabaseContext;
 using Common.Message.Queue.Commands;
 using Common.Message.Queue.Services;
-using System.Text.Json;
 
 namespace RentCar.Api.Consumers;
 
@@ -17,7 +17,8 @@ internal sealed class RentCarConsumer(
         await exceptionsHandlerService.ExecuteAsync(
             async () =>
             {
-                throw new Exception("Testing rollback logic");
+                // exception to test rollbac from here
+                //throw new Exception($"Exception in {nameof(RentCarConsumer)}");
 
                 Console.WriteLine($"Car renting - Plate Number {context.Message.CarPlateNumber} for traveler {context.Message.TravelerId}");
 

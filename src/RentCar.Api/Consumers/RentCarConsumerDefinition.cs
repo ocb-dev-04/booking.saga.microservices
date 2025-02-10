@@ -5,7 +5,7 @@ namespace RentCar.Api.Consumers;
 internal sealed class RentCarConsumerDefinition
     : ConsumerDefinition<RentCarConsumer>
 {
-    private readonly static string _consumerName = "rent-car-saga-queue";
+    private readonly static string _consumerName = "saga-rent-car-queue";
 
     public RentCarConsumerDefinition()
     {
